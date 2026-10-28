@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HKDu | Professional Video Editor</title>
+<meta name="description" content="HKDu, Professional Video Editor. Clean cuts, sharp storytelling, and polished finishes, master DaVinci Resolve.">
+<style>
+:root{
+  --bg:#0a0c13;
+  --panel:#12151f;
+  --text:#eef0f8;
+  --muted:#b4bacf;
+  --violet:#8b6cff;
+  --cyan:#22e0ff;
+  --gold:#ffc83d;
+  --red:#ff4d5e;
+  --line:#272c3d;
+  --bar:30px;
+  --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--bar) + 12px)}
+body{
+  margin:0;background:var(--bg);color:var(--text);font-family:var(--font);
+  font-size:1rem;line-height:1.6;padding-top:var(--bar);overflow-x:hidden;
+  -webkit-text-size-adjust:100%;
+}
+a{color:inherit}
+/* ---------- Timeline ruler ---------- */
+.ruler{
+  position:fixed;top:0;left:0;right:0;height:var(--bar);z-index:50;
+  background:#0d1019;border-bottom:1px solid var(--line);overflow:hidden;
+}
+.ticks{
+  position:absolute;inset:auto 0 0 0;height:8px;
+  background:
+    repeating-linear-gradient(90deg,#5b6280 0 1px,transparent 1px 40px),
+    repeating-linear-gradient(90deg,#383e56 0 1px,transparent 1px 8px);
+  background-size:100% 100%,100% 50%;background-repeat:no-repeat,repeat-x;
+  background-position:0 100%,0 100%;
+}
+.tc{
+  position:absolute;left:12px;top:3px;font:700 .8125rem/1.2 var(--mono);
+  color:var(--gold);letter-spacing:.04em;background:#0d1019;padding:1px 6px;border-radius:4px;
+}
+.tc small{color:var(--muted);font-weight:400;margin-right:6px}
+.progress{position:absolute;left:0;bottom:0;height:3px;width:0;background:linear-gradient(90deg,var(--cyan),var(--violet))}
+.playhead{
+  position:absolute;top:0;bottom:0;left:0;width:2px;background:var(--red);
+  box-shadow:0 0 8px var(--red);will-change:left;
+}
+.playhead::before{
+  content:"";position:absolute;top:0;left:-6px;border:7px solid transparent;border-top:9px solid var(--red);border-bottom:0;
+}
+/* ---------- Clips ---------- */
+main{max-width:1100px;margin:0 auto;padding:12px 16px 24px}
+.clip{
+  position:relative;background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  padding:48px 18px 28px;margin:0 0 12px;overflow:hidden;
+  --c:var(--violet);
+}
+.clip::before{ /* clip header strip */
+  content:"";position:absolute;left:0;right:0;top:0;height:30px;
+  background:linear-gradient(90deg,var(--c),color-mix(in srgb,var(--c) 40%,#0a0c13));opacity:.9;
+}
+.track{
+  position:absolute;top:0;left:0;height:30px;display:flex;align-items:center;gap:8px;padding:0 12px;
+  font:700 .8125rem/1 var(--mono);letter-spacing:.06em;color:#0a0c13;
+}
+.track b{background:#0a0c13;color:var(--c);padding:4px 7px;border-radius:4px}
+.clip.v1{--c:#a68cff}
+.clip.v2{--c:#2fe3ff}
+.clip.a1{--c:#ffc83d}
+.clip.a2{--c:#5af2b0}
+.clip.v3{--c:#ff7a8a}
+.wave{display:block;width:100%;height:36px;margin-top:20px;opacity:.9}
+.wave rect{fill:var(--c);transform-box:fill-box;transform-origin:center;animation:pulse 2.4s ease-in-out infinite alternate}
+@keyframes pulse{from{transform:scaleY(.55)}to{transform:scaleY(1)}}
+h1,h2,h3{line-height:1.15;margin:0}
+.label{
+  display:inline-block;font:700 .8125rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;
+  color:var(--cyan);margin:0 0 12px
+}
+h1{font-size:2.25rem;letter-spacing:-.02em;
+  background:linear-gradient(90deg,#fff,var(--cyan) 55%,var(--violet));
+  -webkit-background-clip:text;background-clip:text;color:transparent;padding-bottom:4px}
+h2{font-size:1.75rem;letter-spacing:-.01em;margin-bottom:16px}
+h3{font-size:1.25rem}
+.lead{font-size:1.125rem;color:var(--muted);margin:16px 0 24px;max-width:36em}
+.btns{display:flex;flex-direction:column;gap:12px}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 24px;
+  border-radius:8px;font-weight:700;text-decoration:none;border:2px solid transparent;font-size:1rem
+}
+.btn.primary{background:var(--gold);color:#14110a}
+.btn.ghost{border-color:var(--cyan);color:var(--cyan)}
+.btn:hover,.btn:focus-visible{box-shadow:0 0 0 3px rgba(34,224,255,.35),0 0 18px rgba(139,108,255,.6)}
+.btn:focus-visible{outline:2px solid #fff;outline-offset:2px}
+/* work */
+.videos{display:grid;gap:28px}
+.video{margin:0}
+.video .genre{
+  display:inline-block;font:700 .8125rem/1 var(--mono);color:#0a0c13;background:var(--c2,var(--cyan));
+  padding:6px 9px;border-radius:4px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px
+}
+.video h3{margin-bottom:6px}
+.video p{margin:0 0 14px;color:var(--muted)}
+.frame{position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:8px;overflow:hidden;
+  border:1px solid var(--c2,var(--cyan));box-shadow:0 0 22px rgba(139,108,255,.25)}
+.frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.video.vertical .frame{aspect-ratio:9/16;max-width:320px;margin:0 auto}
+.video.vertical{--c2:var(--gold)}
+.video.doc{--c2:var(--cyan)}
+.video.talk{--c2:#b9a5ff}
+/* steps */
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:10px;counter-reset:s}
+.steps li{
+  position:relative;background:#0d1019;border:1px solid var(--line);border-left:4px solid var(--gold);
+  border-radius:6px;padding:14px 16px 14px 16px
+}
+.steps li:nth-child(2){border-left-color:var(--cyan)}
+.steps li:nth-child(3){border-left-color:#5af2b0}
+.steps li:nth-child(4){border-left-color:var(--violet)}
+.steps li:nth-child(5){border-left-color:var(--red)}
+.steps h3{font-size:1.125rem;margin-bottom:2px}
+.steps p{margin:0;color:var(--muted)}
+.steps .n{font:700 .8125rem/1 var(--mono);color:var(--gold);letter-spacing:.08em;display:block;margin-bottom:6px}
+/* tools */
+.tool{
+  display:flex;flex-direction:column;gap:4px;background:#0d1019;border:1px solid var(--c);
+  border-radius:8px;padding:16px 18px;max-width:420px
+}
+.tool strong{font-size:1.25rem}
+.tool span{color:var(--muted)}
+/* contact */
+.contact p{color:var(--muted);max-width:34em;margin:0 0 22px;font-size:1.0625rem}
+footer{
+  max-width:1100px;margin:0 auto;padding:8px 16px 40px;color:var(--muted);font-size:1rem;
+  display:flex;align-items:center;gap:10px
+}
+footer::before{content:"";flex:0 0 28px;height:4px;border-radius:2px;background:linear-gradient(90deg,var(--cyan),var(--violet))}
+/* ---------- Desktop ---------- */
+@media (min-width:768px){
+  :root{--bar:44px}
+  .tc{top:8px;font-size:.9375rem;left:20px}
+  .ticks{height:12px}
+  main{padding:20px 32px 40px}
+  .clip{padding:56px 40px 40px;margin-bottom:16px}
+  .track{height:34px;padding:0 16px}
+  .clip::before{height:34px}
+  h1{font-size:3.75rem}
+  h2{font-size:2.5rem}
+  .btns{flex-direction:row}
+  .steps{grid-template-columns:repeat(2,1fr)}
+  .wave{height:48px}
+}
+@media (min-width:1024px){
+  .steps{grid-template-columns:repeat(5,1fr)}
+  /* two landscape videos stacked on the left (2/3), tall short on the right (1/3) */
+  .videos{grid-template-columns:2fr 1fr;grid-template-rows:auto auto;gap:28px;align-items:center}
+  .video.talk{grid-column:1;grid-row:1}
+  .video.doc{grid-column:1;grid-row:2}
+  .video.vertical{grid-column:2;grid-row:1/3;align-self:start}
+  .video.talk,.video.doc{
+    display:grid;grid-template-columns:minmax(0,7fr) minmax(0,3fr);grid-template-rows:auto auto auto 1fr;
+    column-gap:24px;align-items:start;
+  }
+  .video.talk .frame,.video.doc .frame{grid-column:1;grid-row:1/5}
+  .video.talk .genre,.video.doc .genre{grid-column:2;grid-row:1;justify-self:start}
+  .video.talk h3,.video.doc h3{grid-column:2;grid-row:2}
+  .video.talk p,.video.doc p{grid-column:2;grid-row:3;margin:0}
+}
+@media (max-width:360px){h1{font-size:2rem}}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .wave rect{animation:none}
+  *{transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<div class="ruler" aria-hidden="true">
+  <div class="tc"><small>TC</small><span id="tc">00:00:00:00</span></div>
+  <div class="ticks"></div>
+  <div class="progress" id="prog"></div>
+  <div class="playhead" id="ph"></div>
+</div>
+
+<main>
+  <!-- HERO -->
+  <section class="clip v1" id="top" aria-labelledby="h-hero">
+    <div class="track" aria-hidden="true"><b>V1</b> HERO</div>
+    <p class="label">HKDu</p>
+    <h1 id="h-hero">Professional Video Editor</h1>
+    <p class="lead">Clean cuts, sharp storytelling, and polished finishes, master DaVinci Resolve.</p>
+    <div class="btns">
+      <a class="btn primary" href="#work">See my work</a>
+      <a class="btn ghost" href="mailto:huydudtk09@gmail.com">Hire me</a>
+    </div>
+    <svg class="wave" data-n="64" aria-hidden="true" focusable="false"></svg>
+  </section>
+
+  <!-- WORK -->
+  <section class="clip v2" id="work" aria-labelledby="h-work">
+    <div class="track" aria-hidden="true"><b>V2</b> WORK</div>
+    <p class="label">Work</p>
+    <h2 id="h-work">Selected edits</h2>
+    <div class="videos">
+      <article class="video doc">
+        <span class="genre">Faceless documentary</span>
+        <h3>How the Colosseum Was Built</h3>
+        <p>B-roll sourcing, sound design, text animation, and motion graphics.</p>
+        <div class="frame">
+          <iframe src="https://drive.google.com/file/d/1pryIcX5DomkxywiOLyDzayFhpH-nsUKZ/preview" title="Faceless documentary: How the Colosseum Was Built" loading="lazy" allow="autoplay; fullscreen" allowfullscreen></iframe>
+        </div>
+      </article>
+      <article class="video vertical">
+        <span class="genre">Short-form reel</span>
+        <h3>Buying a Home Is Exciting</h3>
+        <p>Fast, punchy edit for short-form platforms.</p>
+        <div class="frame">
+          <iframe src="https://drive.google.com/file/d/18Xur_2c5FzVg34lxkMKpdBfY8gILGaqy/preview" title="Short-form reel: Buying a Home Is Exciting" loading="lazy" allow="autoplay; fullscreen" allowfullscreen></iframe>
+        </div>
+      </article>
+      <article class="video talk">
+        <span class="genre">Talking head</span>
+        <h3>15 Things Before Moving to Charlotte, NC</h3>
+        <p>Tight cuts, B-roll, captions, and basic color correction.</p>
+        <div class="frame">
+          <iframe src="https://drive.google.com/file/d/1miHzS3OJWhSVh-zv_WD6WrnfS-YDSDCG/preview" title="Talking head: 15 Things Before Moving to Charlotte, NC" loading="lazy" allow="autoplay; fullscreen" allowfullscreen></iframe>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- WHAT I DO -->
+  <section class="clip a1" id="process" aria-labelledby="h-do">
+    <div class="track" aria-hidden="true"><b>A1</b> WHAT I DO</div>
+    <p class="label">What I do</p>
+    <h2 id="h-do">Full workflow, one editor</h2>
+    <ol class="steps">
+      <li><span class="n" aria-hidden="true">01</span><h3>Rough cut</h3><p>Trim, structure, and pace the story from raw footage.</p></li>
+      <li><span class="n" aria-hidden="true">02</span><h3>B-roll</h3><p>Find and place footage that supports the narration.</p></li>
+      <li><span class="n" aria-hidden="true">03</span><h3>Text &amp; motion graphics</h3><p>Animated titles and graphics that explain and engage.</p></li>
+      <li><span class="n" aria-hidden="true">04</span><h3>Sound design</h3><p>Music, effects, and audio balance that support the mood.</p></li>
+      <li><span class="n" aria-hidden="true">05</span><h3>Color</h3><p>Basic color correction for a clean, consistent look.</p></li>
+    </ol>
+    <svg class="wave" data-n="72" aria-hidden="true" focusable="false"></svg>
+  </section>
+
+  <!-- TOOLS -->
+  <section class="clip a2" id="tools" aria-labelledby="h-tools">
+    <div class="track" aria-hidden="true"><b>A2</b> TOOLS</div>
+    <p class="label">Tools</p>
+    <h2 id="h-tools">Tools</h2>
+    <div class="tool">
+      <strong>DaVinci Resolve</strong>
+      <span>Main editing software</span>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="clip v3 contact" id="contact" aria-labelledby="h-contact">
+    <div class="track" aria-hidden="true"><b>V3</b> CONTACT</div>
+    <p class="label">Contact</p>
+    <h2 id="h-contact">Let's edit your next video</h2>
+    <p>Running a faceless or talking-head YouTube channel? Send me a message and tell me about your project.</p>
+    <div class="btns">
+      <a class="btn primary" href="mailto:huydudtk09@gmail.com">huydudtk09@gmail.com</a>
+    </div>
+    <svg class="wave" data-n="56" aria-hidden="true" focusable="false"></svg>
+  </section>
+</main>
+
+<footer>
+  <span>&copy; 2026 HKDu. Professional Video Editor.</span>
+</footer>
+
+<script>
+(function(){
+  /* decorative waveforms */
+  var NS="http://www.w3.org/2000/svg";
+  document.querySelectorAll(".wave").forEach(function(svg,k){
+    var n=+svg.getAttribute("data-n")||60, w=n*6;
+    svg.setAttribute("viewBox","0 0 "+w+" 40");
+    svg.setAttribute("preserveAspectRatio","none");
+    for(var i=0;i<n;i++){
+      var v=Math.abs(Math.sin(i*.37+k*2)*Math.cos(i*.11+k))*.8+Math.abs(Math.sin(i*1.7+k))*.2;
+      var h=Math.max(3,v*38);
+      var r=document.createElementNS(NS,"rect");
+      r.setAttribute("x",i*6+1);r.setAttribute("width",3);
+      r.setAttribute("y",(40-h)/2);r.setAttribute("height",h);r.setAttribute("rx",1.5);
+      r.style.animationDelay=(-(i%9)*.27)+"s";
+      svg.appendChild(r);
+    }
+  });
+  /* timecode + playhead follow scroll */
+  var tc=document.getElementById("tc"),ph=document.getElementById("ph"),pr=document.getElementById("prog");
+  var TOTAL=3600+1800, FPS=24, ticking=false;
+  function pad(x){return (x<10?"0":"")+x}
+  function update(){
+    ticking=false;
+    var max=document.documentElement.scrollHeight-window.innerHeight;
+    var p=max>0?Math.min(1,Math.max(0,window.scrollY/max)):0;
+    var f=Math.floor(p*TOTAL*FPS);
+    var ff=f%FPS, s=Math.floor(f/FPS), ss=s%60, m=Math.floor(s/60), mm=m%60, hh=Math.floor(m/60);
+    tc.textContent=pad(hh)+":"+pad(mm)+":"+pad(ss)+":"+pad(ff);
+    var pct=(p*100).toFixed(2);
+    pr.style.width=pct+"%";
+    ph.style.left="calc("+pct+"% - "+(p*2).toFixed(2)+"px)";
+  }
+  function req(){if(!ticking){ticking=true;requestAnimationFrame(update)}}
+  window.addEventListener("scroll",req,{passive:true});
+  window.addEventListener("resize",req);
+  update();
+})();
+</script>
+</body>
+</html>
